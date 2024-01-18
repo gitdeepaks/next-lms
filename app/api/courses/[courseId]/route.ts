@@ -2,10 +2,10 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
-export const PATCH = async (
+export async function PATCH(
   req: Request,
   { params }: { params: { courseId: string } }
-) => {
+) {
   try {
     const { userId } = auth();
 
@@ -17,8 +17,8 @@ export const PATCH = async (
 
     const course = await db.course.update({
       where: {
-        id: courseId,
-        userId,
+        id: params.courseId,
+        userId: userId,
       },
       data: {
         ...values,
@@ -29,4 +29,4 @@ export const PATCH = async (
     console.log("[COURSE_ID]", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
-};
+}
