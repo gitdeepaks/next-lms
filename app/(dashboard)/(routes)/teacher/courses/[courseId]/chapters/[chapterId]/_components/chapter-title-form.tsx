@@ -19,24 +19,23 @@ import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { error } from "console";
 
 interface ChapterTitleFormProps {
   initialData: {
     title: string;
   };
   courseId: string;
+  chapterId: string;
 }
 
 const formSchema = z.object({
-  title: z.string().min(1, {
-    message: "Title is required",
-  }),
+  title: z.string().min(1),
 });
 
 export const ChapterTitleForm = ({
   initialData,
   courseId,
+  chapterId,
 }: ChapterTitleFormProps) => {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -54,13 +53,15 @@ export const ChapterTitleForm = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await axios.patch(`/api/courses/${courseId}`, values);
-      toast.success("Course updated");
+      await axios.patch(
+        `/api/courses/${courseId}/chapters/${chapterId}`,
+        values
+      );
+      toast.success("Chapter updated");
       toggleEditing();
       router.refresh();
-    } catch (error: any) {
-      // { message: string
-      toast.error("Something went wrong", error);
+    } catch {
+      toast.error("Something went wrong");
     }
   };
 
@@ -69,8 +70,9 @@ export const ChapterTitleForm = ({
       <div className="font-medium flex items-center justify-between">
         Course Title
         <Button onClick={toggleEditing} variant="ghost">
-          {isEditing && <>Cancel</>}
-          {!isEditing && (
+          {isEditing ? (
+            <>Cancel</>
+          ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
               Edit Title
