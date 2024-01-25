@@ -1,7 +1,6 @@
 import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import React from "react";
 import Link from "next/link";
 import { ArrowLeft, LayoutDashboard } from "lucide-react";
 import { IconBadge } from "@/components/icon-badge";
@@ -21,6 +20,7 @@ const ChapterIdPage = async ({
   const chapter = await db.chapter.findUnique({
     where: {
       id: params.chapterId,
+      courseId: params.courseId,
     },
     include: {
       muxData: true,
@@ -53,7 +53,7 @@ const ChapterIdPage = async ({
             <div className="flex flex-col gap-y-2">
               <h1 className="text-2xl font-medium">Chapter Creation</h1>
               <span className="text-sm text-slate-700">
-                complete all fieldd{completionText}
+                complete all fields{completionText}
               </span>
             </div>
           </div>
@@ -68,7 +68,7 @@ const ChapterIdPage = async ({
             </div>
             <ChapterTitleForm
               initialData={chapter}
-              courseId={params.chapterId}
+              courseId={params.courseId}
               chapterId={params.chapterId}
             />
           </div>

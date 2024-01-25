@@ -65,6 +65,8 @@ export const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
 
   const onReorder = async (updateData: { id: string; position: number }[]) => {
     try {
+      setIsUpdating(true);
+
       await axios.put(`/api/courses/${courseId}/chapters/reorder`, {
         list: updateData,
       });
@@ -77,7 +79,7 @@ export const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
     }
   };
 
-  const onEdit = async (id: string) => {
+  const onEdit = (id: string) => {
     router.push(`/teacher/courses/${courseId}/chapters/${id}`);
   };
   return (
