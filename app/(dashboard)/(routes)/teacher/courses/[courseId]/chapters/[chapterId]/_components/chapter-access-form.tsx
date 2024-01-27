@@ -1,8 +1,14 @@
 "use client";
+
 import * as z from "zod";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Pencil } from "lucide-react";
+import { useState } from "react";
+
+import { useRouter } from "next/navigation";
+import { Chapter } from "@prisma/client";
 
 import {
   Form,
@@ -10,21 +16,12 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-
 import { Button } from "@/components/ui/button";
-import { Check, Pencil } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Chapter } from "@prisma/client";
-import { Editor } from "@/components/editor";
-import { Preview } from "@/components/preview";
-import { Checkbox } from "@/components/ui/checkbox";
 
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 interface ChapterAccessFormProps {
   initialData: Chapter;
   courseId: string;
@@ -40,12 +37,11 @@ export const ChapterAccessForm = ({
   courseId,
   chapterId,
 }: ChapterAccessFormProps) => {
-  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
 
-  const toggleEditing = () => {
-    setIsEditing((prev) => !prev);
-  };
+  const toggleEdit = () => setIsEditing((current) => !current);
+
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,11 +59,10 @@ export const ChapterAccessForm = ({
         values
       );
       toast.success("Chapter updated");
-      toggleEditing();
+      toggleEdit();
       router.refresh();
-    } catch (error: any) {
-      // { message: string
-      toast.error("Something went wrong", error);
+    } catch {
+      toast.error("Something went wrong");
     }
   };
 
@@ -75,9 +70,10 @@ export const ChapterAccessForm = ({
     <div className="mt-6 border bg-slate-100 rounded-md p-4">
       <div className="font-medium flex items-center justify-between">
         Chapter access
-        <Button onClick={toggleEditing} variant="ghost">
-          {isEditing && <>Cancel</>}
-          {!isEditing && (
+        <Button onClick={toggleEdit} variant="ghost">
+          {isEditing ? (
+            <>Cancel</>
+          ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
               Edit access
@@ -93,9 +89,9 @@ export const ChapterAccessForm = ({
           )}
         >
           {initialData.isFree ? (
-            <>This chapter is free for preview</>
+            <>This chapter is free for preview.</>
           ) : (
-            <>This chapter is not free</>
+            <>This chapter is not free.</>
           )}
         </p>
       )}
@@ -111,7 +107,10 @@ export const ChapterAccessForm = ({
               render={({ field }) => (
                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                   <FormControl>
-                    <Checkbox checked={field.value} onChange={field.onChange} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormDescription>
@@ -123,7 +122,7 @@ export const ChapterAccessForm = ({
               )}
             />
             <div className="flex items-center gap-x-2">
-              <Button disabled={!z.isValid || isSubmitting} type="submit">
+              <Button disabled={!isValid || isSubmitting} type="submit">
                 Save
               </Button>
             </div>
